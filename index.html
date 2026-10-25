@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>汪宸锋 — 架上绘画</title>
+<style>
+  :root{
+    --paper:#FDFCF8;
+    --ink:#2B2620;
+    --grey:#8C8578;
+    --gold:#A8852F;
+    --gold-soft:#C9B272;
+    --line:#E9E3D4;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:88px}
+  body{
+    background:var(--paper);color:var(--ink);
+    font-family:"Songti SC","STSong","Noto Serif SC","Source Han Serif SC","SimSun",serif;
+    font-size:16px;line-height:2;letter-spacing:.02em;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--gold);color:#fff}
+  a{color:inherit;text-decoration:none}
+  img{display:block;width:100%;height:100%;object-fit:cover}
+
+  /* ---------- 固定导航 ---------- */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:100;height:68px;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 clamp(20px,4vw,60px);
+    background:rgba(253,252,248,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  nav::after{
+    content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;
+    background:linear-gradient(90deg,transparent,var(--gold-soft) 20%,var(--gold) 50%,var(--gold-soft) 80%,transparent);
+  }
+  .nav-name{font-size:17px;letter-spacing:.42em;font-weight:700}
+  .nav-links{display:flex;gap:clamp(18px,3vw,46px)}
+  .nav-links a{font-size:13px;letter-spacing:.3em;color:var(--grey);padding:4px 0;position:relative;transition:color .4s}
+  .nav-links a::after{
+    content:"";position:absolute;left:50%;bottom:-2px;width:5px;height:5px;border-radius:50%;
+    background:var(--gold);transform:translateX(-50%) scale(0);transition:transform .35s;
+  }
+  .nav-links a:hover,.nav-links a.active{color:var(--ink)}
+  .nav-links a.active::after,.nav-links a:hover::after{transform:translateX(-50%) scale(1)}
+
+  /* ---------- 首屏 ---------- */
+  header{
+    min-height:100vh;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;
+    padding:0 20px;position:relative;overflow:hidden;
+  }
+  header::before,header::after{
+    content:"";position:absolute;top:0;bottom:0;width:clamp(10px,1.6vw,20px);
+    background:
+      repeating-linear-gradient(180deg,var(--gold-soft) 0 2px,transparent 2px 26px);
+    opacity:.35;
+  }
+  header::before{left:clamp(14px,3vw,48px)}
+  header::after{right:clamp(14px,3vw,48px)}
+  .hero-ornament{display:flex;align-items:center;gap:18px;color:var(--gold);font-size:13px;letter-spacing:.5em;margin-bottom:38px}
+  .hero-ornament::before,.hero-ornament::after{
+    content:"";width:clamp(46px,8vw,110px);height:1px;
+    background:linear-gradient(90deg,transparent,var(--gold));
+  }
+  .hero-ornament::after{background:linear-gradient(90deg,var(--gold),transparent)}
+  .hero-name{
+    font-size:clamp(76px,15vw,210px);font-weight:400;line-height:1.08;
+    letter-spacing:.2em;text-indent:.2em;
+  }
+  .hero-sub{
+    margin-top:36px;font-size:clamp(13px,1.5vw,16px);
+    letter-spacing:.62em;text-indent:.62em;color:var(--grey);
+  }
+  .hero-frame{
+    margin-top:60px;width:min(420px,70vw);height:12px;position:relative;
+    border-top:1px solid var(--gold-soft);border-bottom:1px solid var(--gold-soft);
+  }
+  .hero-frame::before,.hero-frame::after{
+    content:"";position:absolute;top:2.5px;width:5px;height:5px;background:var(--gold);
+    transform:rotate(45deg);
+  }
+  .hero-frame::before{left:0}
+  .hero-frame::after{right:0}
+  .hero-hint{margin-top:26px;font-size:11px;letter-spacing:.44em;color:var(--grey)}
+
+  /* ---------- 通用板块 ---------- */
+  section{max-width:1280px;margin:0 auto;padding:clamp(90px,12vh,150px) clamp(20px,5vw,60px)}
+  .sec-head{text-align:center;margin-bottom:clamp(48px,7vh,80px)}
+  .sec-title{font-size:clamp(26px,3vw,36px);font-weight:400;letter-spacing:.34em;text-indent:.34em}
+  .sec-rule{
+    margin:22px auto 0;display:flex;align-items:center;justify-content:center;gap:14px;
+    color:var(--gold);font-size:12px;
+  }
+  .sec-rule::before,.sec-rule::after{content:"";width:72px;height:1px;background:linear-gradient(90deg,transparent,var(--gold-soft))}
+  .sec-rule::after{background:linear-gradient(90deg,var(--gold-soft),transparent)}
+
+  /* ---------- 金框（冬宫画框） ---------- */
+  .frame{
+    padding:clamp(10px,1.4vw,16px);background:#FBF7EC;
+    border:1px solid var(--gold-soft);
+    box-shadow:
+      0 0 0 5px #F3ECD9,
+      0 0 0 6px var(--gold),
+      0 14px 34px rgba(90,70,20,.16);
+    overflow:hidden;position:relative;
+  }
+  .frame .mat{background:#fff;padding:clamp(8px,1vw,12px);box-shadow:inset 0 0 0 1px var(--line)}
+  .frame img{transition:transform 1.6s cubic-bezier(.22,1,.36,1)}
+
+  /* ---------- 关于我 ---------- */
+  .about-grid{display:grid;grid-template-columns:5fr 7fr;gap:clamp(36px,6vw,90px);align-items:start}
+  .about-photo .frame{aspect-ratio:1/1}
+  .about-photo .frame img{filter:saturate(.92)}
+  .about-photo .frame:hover img{transform:scale(1.04)}
+  .photo-cap{margin-top:18px;text-align:center;font-size:12px;letter-spacing:.26em;color:var(--grey)}
+  .about-text p{margin-bottom:1.6em;text-align:justify}
+  .about-text p:last-of-type{margin-bottom:0}
+  .about-meta{
+    margin-top:46px;padding-top:28px;border-top:1px solid var(--line);
+    display:grid;grid-template-columns:auto 1fr;row-gap:12px;column-gap:36px;
+    font-size:13.5px;letter-spacing:.12em;
+  }
+  .about-meta dt{color:var(--gold);letter-spacing:.3em}
+  .about-meta dd{letter-spacing:.06em}
+
+  /* ---------- 作品画廊 ---------- */
+  .works-grid{
+    display:grid;grid-template-columns:repeat(6,1fr);
+    gap:clamp(28px,4vw,56px) clamp(24px,3vw,44px);
+  }
+  .work{grid-column:span 2}
+  .work:nth-child(4){grid-column:2 / span 2}
+  .work:nth-child(5){grid-column:4 / span 2}
+  .work .frame{aspect-ratio:1/1}
+  .work:hover .frame img{transform:scale(1.08)}
+  .work figcaption{text-align:center;margin-top:20px}
+  .work-title{font-size:16px;letter-spacing:.18em}
+  .work-info{font-size:12px;color:var(--grey);letter-spacing:.16em;margin-top:4px}
+
+  /* ---------- 展览经历 ---------- */
+  .exh-list{list-style:none;max-width:920px;margin:0 auto}
+  .exh-list li{
+    display:grid;grid-template-columns:120px 1fr auto;gap:26px;align-items:baseline;
+    padding:28px 10px;border-bottom:1px solid var(--line);
+    transition:background .5s,padding-left .5s;
+  }
+  .exh-list li:first-child{border-top:1px solid var(--line)}
+  .exh-list li:hover{background:#F8F4E9;padding-left:20px}
+  .exh-year{font-size:17px;letter-spacing:.22em;color:var(--gold)}
+  .exh-name{font-size:16.5px;letter-spacing:.1em}
+  .exh-name small{font-size:12.5px;color:var(--grey);letter-spacing:.16em;margin-left:14px}
+  .exh-loc{font-size:13px;color:var(--grey);letter-spacing:.14em}
+  .exh-disclaimer{
+    margin-top:clamp(48px,7vh,80px);text-align:center;
+    font-size:clamp(30px,5.2vw,68px);font-weight:700;line-height:1.4;
+    letter-spacing:.3em;text-indent:.3em;color:var(--gold);
+    text-shadow:0 2px 0 #F3ECD9,0 8px 24px rgba(168,133,47,.25);
+  }
+  .exh-disclaimer small{
+    display:block;margin-top:18px;font-size:12px;font-weight:400;
+    letter-spacing:.5em;text-indent:.5em;color:var(--grey);text-shadow:none;
+  }
+
+  /* ---------- 页脚 ---------- */
+  footer{border-top:1px solid var(--line);position:relative}
+  footer::before{
+    content:"";position:absolute;top:-4px;left:0;right:0;height:1px;
+    background:linear-gradient(90deg,transparent,var(--gold-soft) 20%,var(--gold) 50%,var(--gold-soft) 80%,transparent);
+  }
+  .foot-inner{max-width:1240px;margin:0 auto;padding:clamp(70px,10vh,120px) clamp(20px,5vw,60px) 60px;text-align:center}
+  .foot-ornament{color:var(--gold);font-size:14px;letter-spacing:.5em;margin-bottom:28px}
+  .foot-label{font-size:12px;letter-spacing:.5em;text-indent:.5em;color:var(--grey);margin-bottom:26px}
+  .foot-mail{font-size:clamp(22px,3.4vw,40px);letter-spacing:.1em;position:relative;display:inline-block;padding-bottom:8px}
+  .foot-mail::after{content:"";position:absolute;left:0;bottom:0;width:100%;height:1px;background:var(--gold);transform:scaleX(0);transform-origin:center;transition:transform .5s}
+  .foot-mail:hover::after{transform:scaleX(1)}
+  .foot-social{display:flex;justify-content:center;gap:clamp(22px,4vw,54px);margin-top:48px}
+  .foot-social a{font-size:13px;letter-spacing:.3em;color:var(--grey);transition:color .4s}
+  .foot-social a:hover{color:var(--gold)}
+  .foot-copy{margin-top:66px;font-size:11.5px;letter-spacing:.3em;color:#B7B1A2}
+
+  /* ---------- 入场动效 ---------- */
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity 1.1s ease,transform 1.1s cubic-bezier(.22,1,.36,1)}
+  .reveal.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  }
+
+  /* ---------- 响应式 ---------- */
+  @media(max-width:900px){
+    .about-grid{grid-template-columns:1fr}
+    .about-photo{max-width:440px;margin:0 auto}
+    .works-grid{grid-template-columns:repeat(2,1fr)}
+    .work{grid-column:auto!important}
+  }
+  @media(max-width:560px){
+    .nav-links{gap:16px}
+    .nav-links a{letter-spacing:.14em}
+    .works-grid{grid-template-columns:1fr}
+    header::before,header::after{display:none}
+    .exh-list li{grid-template-columns:76px 1fr;row-gap:4px}
+    .exh-loc{grid-column:2}
+  }
+</style>
+</head>
+<body>
+
+  <nav>
+    <a class="nav-name" href="#top">汪宸锋</a>
+    <div class="nav-links">
+      <a href="#about">关于</a>
+      <a href="#works">作品</a>
+      <a href="#exhibitions">展览</a>
+      <a href="#contact">联系</a>
+    </div>
+  </nav>
+
+  <header id="top">
+    <div class="hero-ornament">◆ 画廊 ◆</div>
+    <h1 class="hero-name">汪宸锋</h1>
+    <p class="hero-sub">架 上 绘 画</p>
+    <div class="hero-frame"></div>
+    <p class="hero-hint">向下浏览</p>
+  </header>
+
+  <!-- 关于我 -->
+  <section id="about">
+    <div class="sec-head">
+      <h2 class="sec-title">关于我</h2>
+      <div class="sec-rule">◆</div>
+    </div>
+    <div class="about-grid">
+      <div class="about-photo reveal">
+        <div class="frame"><div class="mat">
+          <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=classical%20oil%20painting%20style%20portrait%20of%20a%20young%20asian%20male%20painter%20standing%20in%20a%20grand%20atelier%2C%20holding%20a%20wooden%20palette%2C%20soft%20rembrandt%20lighting%2C%20dark%20umber%20and%20ochre%20palette%2C%20fine%20art%20realism%2C%20museum%20quality&image_size=square" alt="汪宸锋肖像" loading="lazy" />
+        </div></div>
+        <p class="photo-cap">艺术家肖像 · 画室</p>
+      </div>
+      <div class="about-text reveal">
+        <p>汪宸锋，二零零八年生于贵州贵阳，现工作生活于天津。他专注于架上绘画，以油彩为主要媒介，在古典写实传统与当代图像经验之间寻找属于自己的绘画语言。</p>
+        <p>他的画面常常从一束光、一件静物或一个安静的室内开始，层层罩染、缓慢推进。他相信绘画的价值不在于新奇，而在于观看的深度——当眼睛停留得足够久，平凡之物也会显出庄重的质地。</p>
+        <p>近年来，他的创作逐渐转向对「空间」与「光」的纯粹研究，画面日趋简净，色彩趋于克制，试图让绘画回到它最古老的使命：在方寸之间，安放时间。</p>
+        <dl class="about-meta">
+          <dt>出生</dt><dd>二零零八 · 贵州贵阳</dd>
+          <dt>现居</dt><dd>天津</dd>
+          <dt>创作媒介</dt><dd>布面油画 / 坦培拉 / 纸本素描</dd>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- 作品画廊 -->
+  <section id="works">
+    <div class="sec-head">
+      <h2 class="sec-title">作品</h2>
+      <div class="sec-rule">◆</div>
+    </div>
+    <div class="works-grid">
+      <article class="work reveal">
+        <div class="frame"><div class="mat"><img src="./work1.jpg" alt="晨光" loading="lazy" /></div></div>
+        <figcaption><div class="work-title">大奶子男人</div><div class="work-info">二〇二六 · 布面油画</div></figcaption>
+      </article>
+      <article class="work reveal">
+        <div class="frame"><div class="mat"><img src="./work2.jpg" alt="室内" loading="lazy" /></div></div>
+        <figcaption><div class="work-title">绿色哀歌</div><div class="work-info">二〇二五 · 布面油画</div></figcaption>
+      </article>
+      <article class="work reveal">
+        <div class="frame"><div class="mat"><img src="./work3.jpg" alt="静物" loading="lazy" /></div></div>
+        <figcaption><div class="work-title">蓝色哀歌</div><div class="work-info">二〇二四 · 布面油画</div></figcaption>
+      </article>
+      <article class="work reveal">
+        <div class="frame"><div class="mat"><img src="./work4.jpg" alt="穹顶之下" loading="lazy" /></div></div>
+        <figcaption><div class="work-title">穹顶之下</div><div class="work-info">二〇二四 · 布面油画</div></figcaption>
+      </article>
+      <article class="work reveal">
+        <div class="frame"><div class="mat"><img src="./work5.jpg" alt="习作" loading="lazy" /></div></div>
+        <figcaption><div class="work-title">老爸肖像未完成</div><div class="work-info">二〇二三 · 纸本素描</div></figcaption>
+      </article>
+    </div>
+  </section>
+
+  <!-- 展览经历 -->
+  <section id="exhibitions">
+    <div class="sec-head">
+      <h2 class="sec-title">展览经历</h2>
+      <div class="sec-rule">◆</div>
+    </div>
+    <ul class="exh-list">
+      <li class="reveal"><span class="exh-year">2026</span><span class="exh-name">观看的深度<small>个展</small></span><span class="exh-loc">北京 · 中国美术馆</span></li>
+      <li class="reveal"><span class="exh-year">2025</span><span class="exh-name">新写实·七人展<small>群展</small></span><span class="exh-loc">上海 · 中华艺术宫</span></li>
+      <li class="reveal"><span class="exh-year">2025</span><span class="exh-name">古典的回声<small>群展</small></span><span class="exh-loc">南京 · 江苏省美术馆</span></li>
+      <li class="reveal"><span class="exh-year">2024</span><span class="exh-name">一束光<small>个展</small></span><span class="exh-loc">杭州 · 浙江美术馆</span></li>
+      <li class="reveal"><span class="exh-year">2023</span><span class="exh-name">青年油画邀请展<small>群展</small></span><span class="exh-loc">广州 · 广东美术馆</span></li>
+    </ul>
+    <p class="exh-disclaimer reveal">⚠ 以上经历均不属实<small>ALL EXHIBITIONS ABOVE ARE FICTIONAL</small></p>
+  </section>
+  <footer id="contact">
+    <div class="foot-inner">
+      <div class="foot-ornament">◆ ◆ ◆</div>
+      <p class="foot-label">联系</p>
+      <a class="foot-mail" href="mailto:wangchenfeng@art.com">wangchenfeng@art.com</a>
+      <div class="foot-social">
+        <a href="#" target="_blank" rel="noopener">微博</a>
+        <a href="#" target="_blank" rel="noopener">小红书</a>
+        <a href="#" target="_blank" rel="noopener">哔哩哔哩</a>
+        <a href="#" target="_blank" rel="noopener">公众号</a>
+      </div>
+      <p class="foot-copy">© 二〇二六 汪宸锋 · 版权所有</p>
+    </div>
+  </footer>
+
+  <script>
+    // 导航高亮
+    const navLinks = document.querySelectorAll('.nav-links a');
+    const secs = ['about', 'works', 'exhibitions', 'contact'].map(id => document.getElementById(id));
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach(en => {
+        if (en.isIntersecting) {
+          navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + en.target.id));
+        }
+      });
+    }, { rootMargin: '-40% 0px -55% 0px' });
+    secs.forEach(s => s && navObserver.observe(s));
+
+    // 入场动效
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  </script>
+</body>
+</html>
